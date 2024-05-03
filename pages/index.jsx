@@ -1,58 +1,49 @@
-import React, { useEffect, useState } from 'react';
-import { Amplify, Auth, Hub } from 'aws-amplify';
-import { CognitoHostedUIIdentityProvider } from '@aws-amplify/auth';
+import React, { useState } from 'react';
+import { Amplify,Auth } from 'aws-amplify'; // Assuming you're using AWS Amplify for authentication
 import awsconfig from '../src/aws-exports';
 
 Amplify.configure(awsconfig);
 
-export default function App() {
-  const [user, setUser] = useState(null);
-  const [cpf, setCpf] = useState("")
-
-  function updateAttribute() {
-    let params = {};
-    params['custom:cpf'] = cpf;
-    console.log(JSON.stringify(user))
-    let result = Auth.updateUserAttributes(user, params)
-      .then(data => {console.log(data); alert('Atributo salvo')})
-      .catch(err => {console.log(err);alert('Erro')})
-    console.log(result)
-  }
-
-  useEffect(() => {
-    const unsubscribe = Hub.listen("auth", ({ payload: { event, data } }) => {
-      switch (event) {
-        case "signIn":
-          setUser(data);
-          break;
-        case "signOut":
-          setUser(null);
-          break;
-        case "customOAuthState":
-          setCustomState(data);
+export default function Login() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+  
+    const handleLogin = async (event) => {
+      event.preventDefault(); 
+      try {
+        await Auth.signIn(username, password);
+        // If successful, redirect or perform any other action
+        console.log('Logged in successfully!');      
+      } catch (error) {
+        setError(error.message);
       }
-    });
-
-    Auth.currentAuthenticatedUser()
-      .then(currentUser => { setUser(currentUser); console.log("Signed In") })
-      .catch(() => console.log("Not signed in"));
-
-    return unsubscribe;
-  }, []);
-
-  if (!user) {
+    };
+  
     return (
-      <div className="App">
-        <button onClick={() => Auth.federatedSignIn({ provider: CognitoHostedUIIdentityProvider.Google })}>Open Google</button>
-        <button onClick={() => Auth.federatedSignIn()}>Open Hosted UI</button>
+      <div>
+        <h2>Login</h2>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <form onSubmit={(e) => handleLogin(e)}>
+
+          <div>
+            <label>Username:</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div>
+            <label>Password:</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <button type="submit">Login</button>
+        </form>
       </div>
     );
-  }
-  return (
-    <div>
-      <input onChange={e => setCpf(e.target.value)} value={cpf} />
-      <button onClick={updateAttribute}>Update CPF</button><br />
-      <button onClick={() => Auth.signOut()}>Sign Out {user.signInUserSession.idToken.payload.email}</button>
-    </div>
-  )
 }
