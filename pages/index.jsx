@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Amplify,Auth } from 'aws-amplify'; // Assuming you're using AWS Amplify for authentication
 import awsconfig from '../src/aws-exports';
 
@@ -9,10 +9,28 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
   
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+      checkUserSession();
+    }, []);
+  
+    const checkUserSession = async () => {
+      try {
+        const currentUser = await Auth.currentAuthenticatedUser();
+        setUser(currentUser);
+        console.log('user session found with user ' + currentUser);
+      } catch (error) {
+        console.log('No user session found');
+      }
+    };
+
     const handleLogin = async (event) => {
       event.preventDefault(); 
       try {
-        await Auth.signIn(username, password);
+        var userobject = await Auth.signIn(username, password);
+        console.log("the details of the user are " , userobject);
+        setUser(userobject.username);
         // If successful, redirect or perform any other action
         console.log('Logged in successfully!');      
       } catch (error) {
@@ -22,6 +40,13 @@ export default function Login() {
   
     return (
       <div>
+      <h1>Welcome to the Public Page</h1>
+      {user ? (
+        <>
+          <p>User is logged in as: {user.username}</p>         
+        </>
+      ) : (
+        <div>
         <h2>Login</h2>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <form onSubmit={(e) => handleLogin(e)}>
@@ -45,5 +70,7 @@ export default function Login() {
           <button type="submit">Login</button>
         </form>
       </div>
-    );
+      )}
+    </div>
+      );
 }
