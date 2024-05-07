@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Amplify,Auth } from 'aws-amplify'; // Assuming you're using AWS Amplify for authentication
+import { Auth,Amplify } from 'aws-amplify'; // Assuming you're using AWS Amplify for authentication
+import { signIn } from 'aws-amplify/auth';
 import awsconfig from '../src/aws-exports';
+
 
 Amplify.configure(awsconfig);
 
@@ -28,7 +30,10 @@ export default function Login() {
     const handleLogin = async (event) => {
       event.preventDefault(); 
       try {
-        var userobject = await Auth.signIn(username, password);
+        var username = "shekhar.bhabad@kpoint.com";
+        var password = "Global@123";
+        var userobject = await signIn({username,password});
+//        const { isSignedIn, nextStep } = await signIn({ username, password });
         console.log("the details of the user are " , userobject);
         setUser(userobject.username);
         // If successful, redirect or perform any other action
@@ -43,7 +48,8 @@ export default function Login() {
       <h1>Welcome to the Public Page</h1>
       {user ? (
         <>
-          <p>User is logged in as: {user.username}</p>         
+          <p>User is logged in as: {user.username}</p>
+         
         </>
       ) : (
         <div>
