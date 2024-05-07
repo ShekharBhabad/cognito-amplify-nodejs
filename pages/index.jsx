@@ -12,16 +12,16 @@ export default function Login() {
     const [error, setError] = useState('');
   
     const [user, setUser] = useState(null);
-
+    const [invaliduser, setInvalidUser] = useState(null);
     useEffect(() => {
       checkUserSession();
-    }, []);
+    }, [user]);
   
     const checkUserSession = async () => {
       try {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
-        //window.location = "https://experience.kpoint.video/engage/"
+        window.location = "https://experience.kpoint.video/engage/"
         console.log('user session found with user ' + currentUser);
       } catch (error) {
         console.log('No user session found');
@@ -34,6 +34,7 @@ export default function Login() {
         var username = "shekhar.bhabad@kpoint.com";
         var password = "123@Local@786";
         var userobject = await signIn({username,password});
+        setUser(userobject);
         console.log("the details of the user are " , userobject);
         // var challengeResponse = "123@Local@786"
         // var response = await confirmSignIn({challengeResponse,userobject});
@@ -59,10 +60,14 @@ export default function Login() {
     return (
       <div>
       <h1>Welcome to the Public Page</h1>
+      {invaliduser ? (
+        <>
+          <p>You do not have access to this page  !!!! </p>         
+        </>
+      ) :(<></>)}
       {user ? (
         <>
-          <p>User is logged in as: {user.username}</p>
-         
+          <p>User is logged in as: {user.username}</p>         
         </>
       ) : (
         <div>

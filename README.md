@@ -9,6 +9,9 @@ npm install
 npm run dev
 ```
 
+For more Documentation Please refer to 
+https://docs.amplify.aws/react/build-a-backend/auth/connect-your-frontend/sign-in/#confirm-sign-in
+
 Those commands will download the dependencies and start the application locally.
 By default it runs on port 3000 (http://localhost:3000)
 
