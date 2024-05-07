@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Auth,Amplify } from 'aws-amplify'; // Assuming you're using AWS Amplify for authentication
-import { signIn } from 'aws-amplify/auth';
+import { Amplify } from 'aws-amplify'; // Assuming you're using AWS Amplify for authentication
+import { signIn, Auth, getCurrentUser, confirmSignIn } from 'aws-amplify/auth';
 import awsconfig from '../src/aws-exports';
 
 
@@ -19,8 +19,9 @@ export default function Login() {
   
     const checkUserSession = async () => {
       try {
-        const currentUser = await Auth.currentAuthenticatedUser();
+        const currentUser = await getCurrentUser();
         setUser(currentUser);
+        //window.location = "https://experience.kpoint.video/engage/"
         console.log('user session found with user ' + currentUser);
       } catch (error) {
         console.log('No user session found');
@@ -31,17 +32,29 @@ export default function Login() {
       event.preventDefault(); 
       try {
         var username = "shekhar.bhabad@kpoint.com";
-        var password = "Global@123";
+        var password = "123@Local@786";
         var userobject = await signIn({username,password});
-//        const { isSignedIn, nextStep } = await signIn({ username, password });
         console.log("the details of the user are " , userobject);
-        setUser(userobject.username);
-        // If successful, redirect or perform any other action
-        console.log('Logged in successfully!');      
+        // var challengeResponse = "123@Local@786"
+        // var response = await confirmSignIn({challengeResponse,userobject});
+       //console.log("the details of the user are " , response);
       } catch (error) {
-        setError(error.message);
+          // if (error.code === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED") {
+          //   // Prompt the user to set a new password
+          //   const newPassword = prompt("Please set a new password:");
+        
+          //   // Complete the sign-in process with the new password
+          //   response = await confirmSignIn({userObject, newPassword});
+            
+          //   // Handle the response after confirming sign-in with the new password
+          //   console.log("User is signed in with a new password:", response);
+          // } else {
+          //   // Handle other sign-in errors
+          //   console.error("Error during sign-in:", error);
+          // }
       }
     };
+
   
     return (
       <div>
